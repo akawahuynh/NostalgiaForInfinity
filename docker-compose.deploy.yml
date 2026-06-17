@@ -10,6 +10,7 @@ services:
       - "./user_data:/freqtrade/user_data"
       - "./user_data/data:/freqtrade/user_data/data"
       - "./configs:/freqtrade/configs"
+      - "./NostalgiaForInfinityX7.py:/freqtrade/NostalgiaForInfinityX7.py"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}"]
       interval: 1m30s
@@ -17,6 +18,8 @@ services:
       retries: 3
       start_period: 40s
       start_interval: 5s
+    env_file:
+      - .env
     ports:
       - "${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}:${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}"
     # Default command used when running `docker compose up`
