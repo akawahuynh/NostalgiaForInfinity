@@ -8,8 +8,8 @@ services:
     restart: unless-stopped
     volumes:
       - "./user_data:/freqtrade/user_data"
-      - "./user_data/data:/freqtrade/user_data/data"
       - "./configs:/freqtrade/configs"
+      - "./user_data/config.json:/freqtrade/user_data/config.json"
       - "./NostalgiaForInfinityX7.py:/freqtrade/NostalgiaForInfinityX7.py"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${FREQTRADE__API_SERVER__LISTEN_PORT:-8080}"]
