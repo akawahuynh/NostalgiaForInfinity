@@ -9,4 +9,3 @@ RUN pip install --upgrade pip
 USER ftuser
 
 RUN pip install --upgrade "psycopg[binary]"
-
