@@ -1,0 +1,12 @@
+FROM freqtradeorg/freqtrade:stable
+
+USER root
+RUN pip install --upgrade pip
+
+
+
+# Switch back to user (only if you required root above)
+USER ftuser
+
+RUN pip install --upgrade "psycopg[binary]"
+
