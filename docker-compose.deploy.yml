@@ -1,6 +1,9 @@
 services:
   freqtrade:
     image: freqtradeorg/freqtrade:stable
+    build:
+      context: .
+      dockerfile: "./Dockerfile.postgres"
     restart: unless-stopped
     volumes:
       - "./user_data:/freqtrade/user_data"
