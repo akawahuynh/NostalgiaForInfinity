@@ -70,7 +70,7 @@ class NostalgiaForInfinityX7(IStrategy):
   INTERFACE_VERSION = 3
 
   def version(self) -> str:
-    return "v17.4.379"
+    return "v17.4.381"
 
   stoploss = -0.99
 
@@ -1969,21 +1969,38 @@ class NostalgiaForInfinityX7(IStrategy):
     self, pair: str, trade: "Trade", current_time: "datetime", current_rate: float, current_profit: float, **kwargs
   ):
     trade_is_short = trade.is_short
-    long_rapid_mode_tags = self.long_rapid_mode_tags
 
-    calc_total_profit = self.calc_total_profit
-    cache_backtest_profit_snapshot = self.cache_backtest_profit_snapshot
-    filled_order_snapshot = self.filled_order_snapshot
     long_normal_mode_tags = self.long_normal_mode_tags
     long_pump_mode_tags = self.long_pump_mode_tags
     long_quick_mode_tags = self.long_quick_mode_tags
     long_rebuy_mode_tags = self.long_rebuy_mode_tags
+    long_rebuy_grind_mode_tags = self.long_rebuy_grind_mode_tags
+    long_high_profit_mode_tags = self.long_high_profit_mode_tags
+    long_rapid_mode_tags = self.long_rapid_mode_tags
+    long_rapid_rebuy_grind_scalp_mode_tags = self.long_rapid_rebuy_grind_scalp_mode_tags
+    long_grind_mode_tags = self.long_grind_mode_tags
+    long_btc_mode_tags = self.long_btc_mode_tags
+    long_top_coins_mode_tags = self.long_top_coins_mode_tags
+    long_scalp_mode_tags = self.long_scalp_mode_tags
+    long_scalp_rebuy_grind_mode_tags = self.long_scalp_rebuy_grind_mode_tags
+    long_known_mode_tags = self.long_known_mode_tags
+    short_normal_mode_tags = self.short_normal_mode_tags
+    short_pump_mode_tags = self.short_pump_mode_tags
+    short_quick_mode_tags = self.short_quick_mode_tags
+    short_rebuy_mode_tags = self.short_rebuy_mode_tags
+    short_high_profit_mode_tags = self.short_high_profit_mode_tags
+    short_rapid_mode_tags = self.short_rapid_mode_tags
+    short_scalp_mode_tags = self.short_scalp_mode_tags
+    short_scalp_rebuy_grind_mode_tags = self.short_scalp_rebuy_grind_mode_tags
+    short_exit_known_mode_tags = self.short_exit_known_mode_tags
+
+    calc_total_profit = self.calc_total_profit
+    cache_backtest_profit_snapshot = self.cache_backtest_profit_snapshot
+    filled_order_snapshot = self.filled_order_snapshot
     long_exit_normal = self.long_exit_normal
     long_exit_pump = self.long_exit_pump
     long_exit_quick = self.long_exit_quick
     short_exit_normal = self.short_exit_normal
-    short_scalp_mode_tags = self.short_scalp_mode_tags
-    long_scalp_mode_tags = self.long_scalp_mode_tags
 
     df, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
     if len(df) < 6:
@@ -2100,8 +2117,7 @@ class NostalgiaForInfinityX7(IStrategy):
 
     # Long Rebuy mode
     if all(c in long_rebuy_mode_tags for c in enter_tags) or (
-      any(c in long_rebuy_mode_tags for c in enter_tags)
-      and all(c in self.long_rebuy_grind_mode_tags for c in enter_tags)
+      any(c in long_rebuy_mode_tags for c in enter_tags) and all(c in long_rebuy_grind_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.long_exit_rebuy(
         pair,
@@ -2128,7 +2144,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long high profit mode
-    if any(c in self.long_high_profit_mode_tags for c in enter_tags):
+    if any(c in long_high_profit_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_high_profit(
         pair,
         current_rate,
@@ -2157,7 +2173,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # Long rapid mode
     if all(c in long_rapid_mode_tags for c in enter_tags) or (
       any(c in long_rapid_mode_tags for c in enter_tags)
-      and all(c in self.long_rapid_rebuy_grind_scalp_mode_tags for c in enter_tags)
+      and all(c in long_rapid_rebuy_grind_scalp_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.long_exit_rapid(
         pair,
@@ -2184,7 +2200,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long grind mode
-    if all(c in self.long_grind_mode_tags for c in enter_tags):
+    if all(c in long_grind_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_grind(
         pair,
         current_rate,
@@ -2210,7 +2226,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long btc mode
-    if all(c in self.long_btc_mode_tags for c in enter_tags):
+    if all(c in long_btc_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_btc(
         pair,
         current_rate,
@@ -2236,7 +2252,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long Top Coins mode
-    if any(c in self.long_top_coins_mode_tags for c in enter_tags):
+    if any(c in long_top_coins_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_top_coins(
         pair,
         current_rate,
@@ -2265,7 +2281,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # Long scalp mode
     if all(c in long_scalp_mode_tags for c in enter_tags) or (
       any(c in long_scalp_mode_tags for c in enter_tags)
-      and all(c in self.long_scalp_rebuy_grind_mode_tags for c in enter_tags)
+      and all(c in long_scalp_rebuy_grind_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.long_exit_scalp(
         pair,
@@ -2292,7 +2308,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short normal mode
-    if any(c in self.short_normal_mode_tags for c in enter_tags):
+    if any(c in short_normal_mode_tags for c in enter_tags):
       sell, signal_name = short_exit_normal(
         pair,
         current_rate,
@@ -2319,7 +2335,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short Pump mode
-    if any(c in self.short_pump_mode_tags for c in enter_tags):
+    if any(c in short_pump_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_pump(
         pair,
         current_rate,
@@ -2346,7 +2362,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short Quick mode
-    if any(c in self.short_quick_mode_tags for c in enter_tags):
+    if any(c in short_quick_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_quick(
         pair,
         current_rate,
@@ -2373,7 +2389,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short Rebuy mode
-    if all(c in self.short_rebuy_mode_tags for c in enter_tags):
+    if all(c in short_rebuy_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_rebuy(
         pair,
         current_rate,
@@ -2399,7 +2415,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short high profit mode
-    if any(c in self.short_high_profit_mode_tags for c in enter_tags):
+    if any(c in short_high_profit_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_high_profit(
         pair,
         current_rate,
@@ -2426,7 +2442,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short rapid mode
-    if any(c in self.short_rapid_mode_tags for c in enter_tags):
+    if any(c in short_rapid_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_rapid(
         pair,
         current_rate,
@@ -2454,7 +2470,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # Short scalp mode
     if all(c in short_scalp_mode_tags for c in enter_tags) or (
       any(c in short_scalp_mode_tags for c in enter_tags)
-      and all(c in self.short_scalp_rebuy_grind_mode_tags for c in enter_tags)
+      and all(c in short_scalp_rebuy_grind_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.short_exit_scalp(
         pair,
@@ -2481,7 +2497,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Trades not opened by X7
-    if not trade_is_short and (not any(c in self.long_known_mode_tags for c in enter_tags)):
+    if not trade_is_short and (not any(c in long_known_mode_tags for c in enter_tags)):
       # use normal mode for such trades
       sell, signal_name = long_exit_normal(
         pair,
@@ -2509,7 +2525,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Trades not opened by X7
-    if trade_is_short and (not any(c in self.short_exit_known_mode_tags for c in enter_tags)):
+    if trade_is_short and (not any(c in short_exit_known_mode_tags for c in enter_tags)):
       # use normal mode for such trades
       sell, signal_name = short_exit_normal(
         pair,
@@ -16299,6 +16315,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_40) | (rsi_3_4h_gt_40) | (rsi_3_1d_gt_40) | (stochrsi_k_4h_lt_70))
             # 15m & 1h down move, 1h high
             & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_45) | (aroonu_14_1h_lt_70))
+            # 15m & 1h & 4h down move, 4h & 1d overbought
+            & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_50) | (rsi_3_4h_gt_60) | (roc_9_4h_lt_10) | (roc_9_1d_lt_20))
             # 15m & 1h down move, 1h high
             & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_60) | (aroonu_14_1h_lt_90))
             # 15m & 1h down move, 4h high
@@ -16322,23 +16340,23 @@ class NostalgiaForInfinityX7(IStrategy):
             # 15m down move, 15m still not low enough, 1h high
             & ((rsi_3_15m_gt_20) | (aroonu_14_15m_lt_25) | (stochrsi_k_1h_lt_90))
             # 15m down move, 15m still high, 1h high
-            & ((rsi_3_15m_gt_20) | (aroonu_14_15m_lt_40) | aroonu_14_1h_lt_70)
+            & ((rsi_3_15m_gt_20) | (aroonu_14_15m_lt_40) | (aroonu_14_1h_lt_70))
             # 15m down move, 15m still high, 4h high
-            & ((rsi_3_15m_gt_20) | (aroonu_14_15m_lt_40) | aroonu_14_4h_lt_70)
+            & ((rsi_3_15m_gt_20) | (aroonu_14_15m_lt_40) | (aroonu_14_4h_lt_70))
             # 15m down move, 1h & 4h high
-            & ((rsi_3_15m_gt_20) | aroonu_14_1h_lt_80 | aroonu_14_4h_lt_80)
+            & ((rsi_3_15m_gt_20) | (aroonu_14_1h_lt_80) | (aroonu_14_4h_lt_80))
             # 15m down move, 1h high, 1d overbought
-            & ((rsi_3_15m_gt_20) | aroonu_14_1h_lt_80 | (roc_9_1d_lt_10))
+            & ((rsi_3_15m_gt_20) | (aroonu_14_1h_lt_80) | (roc_9_1d_lt_10))
             # 15m down move, 4h high & overbought
-            & ((rsi_3_15m_gt_20) | aroonu_14_4h_lt_70 | (roc_9_4h_lt_30))
+            & ((rsi_3_15m_gt_20) | (aroonu_14_4h_lt_70) | (roc_9_4h_lt_30))
             # 15m down move, 4h high, 1h overbought
-            & ((rsi_3_15m_gt_20) | aroonu_14_4h_lt_100 | (roc_9_1h_lt_30))
+            & ((rsi_3_15m_gt_20) | (aroonu_14_4h_lt_100) | (roc_9_1h_lt_30))
             # 15m down move, 1d high, 4h downtrend
             & ((rsi_3_15m_gt_20) | (aroonu_14_1d_lt_90) | (roc_9_4h_gt_neg_20))
             # 15m down move, 1d high, 4h overbought
-            & ((rsi_3_15m_gt_20) | aroonu_14_1d_lt_100 | (roc_9_4h_lt_20))
+            & ((rsi_3_15m_gt_20) | (aroonu_14_1d_lt_100) | (roc_9_4h_lt_20))
             # 15m down move, 1d high, 1d overbought
-            & ((rsi_3_15m_gt_20) | aroonu_14_1d_lt_100 | (roc_9_1d_lt_20))
+            & ((rsi_3_15m_gt_20) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_20))
             # 15m down move, 15m high, 4h downtrend
             & ((rsi_3_15m_gt_20) | (stochrsi_k_15m_lt_60) | (roc_9_4h_gt_neg_50))
             # 15 down move, 1h high, 1d overbought
@@ -16633,6 +16651,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_4h_gt_20) | (rsi_3_1d_gt_20) | (aroonu_14_1d_lt_60))
             # 4h & 1d down move, 4h still high
             & ((rsi_3_4h_gt_20) | (rsi_3_1d_gt_20) | (stochrsi_k_4h_lt_40))
+            # 4h & 1d down move, 1h still not low enough, 4h still high
+            & ((rsi_3_4h_gt_20) | (rsi_3_1d_gt_25) | (stochrsi_k_1h_lt_30) | (stochrsi_k_4h_lt_40))
             # 4h & 1d down move, 4h & 1d downtrend
             & ((rsi_3_4h_gt_20) | (rsi_3_1d_gt_40) | (roc_9_4h_gt_neg_30) | (roc_9_1d_gt_neg_40))
             # 4h & 1d down move, 1d overbought
@@ -18944,6 +18964,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_15) | (rsi_14_4h_lt_40))
             # 1h & 4h down move, 1h still high
             & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_15) | (aroonu_14_1h_lt_50))
+            # 1h & 4h & 1d down move, 1d high
+            & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_20) | (rsi_3_1d_gt_30) | (aroonu_14_1d_lt_80))
             # 1h & 4h down move, 4h still high
             & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_20) | (stochrsi_k_4h_lt_50))
             # 1h & 4h down move, 1d downtrend
@@ -46385,7 +46407,7 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroonu_14 < 30.0)
       and (last_aroonu_14_4h > 50.0)
       and (last_roc_9_1d > -15.0)
-      and ((last_candle["STOCHRSIk_14_14_3_3_4h"] < 90.0) or (last_roc_9_4h < 30.0))
+      and ((last_stochrsi_k_4h < 90.0) or (last_roc_9_4h < 30.0))
       and (last_ema_50_4h > last_ema_100_4h)
       and (last_close < (last_close_max_48 * 0.95))
     ):
@@ -69630,13 +69652,17 @@ class NostalgiaForInfinityX7(IStrategy):
     last_ema_200_4h = last_candle["EMA_200_4h"]
     last_aroond_14 = last_candle["AROOND_14"]
     last_aroond_14_15m = last_candle["AROOND_14_15m"]
+    last_aroond_14_1h = last_candle["AROOND_14_1h"]
     last_aroond_14_4h = last_candle["AROOND_14_4h"]
+    last_aroond_14_1d = last_candle["AROOND_14_1d"]
     last_roc_9_1h = last_candle["ROC_9_1h"]
     last_roc_9_4h = last_candle["ROC_9_4h"]
     last_roc_9_1d = last_candle["ROC_9_1d"]
     last_stochrsi_k = last_candle["STOCHRSIk_14_14_3_3"]
     last_stochrsik_15m = last_candle["STOCHRSIk_14_14_3_3_15m"]
     last_stochrsi_k_1h = last_candle["STOCHRSIk_14_14_3_3_1h"]
+    last_stochrsi_k_4h = last_candle["STOCHRSIk_14_14_3_3_4h"]
+    last_stochrsi_k_1d = last_candle["STOCHRSIk_14_14_3_3_1d"]
     last_willr_14 = last_candle["WILLR_14"]
     last_willr_84_1h = last_candle["WILLR_84_1h"]
     last_bbu = last_candle["BBU_20_2.0"]
@@ -69693,9 +69719,12 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_rsi_3_4h < 85.0)
       and (last_rsi_14 > 65.0)
       and (last_aroond_14_15m < 25.0)
+      and (last_stochrsik_15m > 30.0)
       and (last_stochrsi_k_1h > 10.0)
       and (last_roc_9_1h < 15.0)
       and (last_roc_9_4h < 15.0)
+      and ((last_rsi_3_1h < 80.0) or (last_rsi_3_1d < 80.0))
+      and ((last_rsi_3_4h < 70.0) or (last_stochrsi_k_4h > 40.0))
       and (last_close < (last_close_min_48 * 1.15))
       and (last_close > (last_ema_12 * 1.020))
     ):
@@ -69742,6 +69771,7 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_roc_9_1h < 20.0)
       and (last_roc_9_4h < 20.0)
       and (last_aroond_14 < 25.0)
+      and ((last_aroond_14_1d < 100.0) or (last_roc_9_1d > -50.0))
       and (last_close > (last_high_max_12_4h * 0.40))
       and (last_rsi_20 > prev_rsi_20)
       and (last_close > (last_sma_16 * 1.040))
@@ -69848,6 +69878,7 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroond_14_15m < 50.0)
       and (last_stochrsi_k > 60.0)
       and (last_stochrsik_15m > 30.0)
+      and ((last_rsi_3_1h < 60.0) or (last_aroond_14_1h < 80.0))
       and (prev_sma_9 > prev_sma_21)
       and (last_sma_9 < last_sma_21)
       and (last_ema_12_4h < last_ema_200_4h)
@@ -69865,6 +69896,9 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroond_14_15m < 30.0)
       and (last_stochrsi_k > 70.0)
       and (last_stochrsik_15m > 70.0)
+      and ((last_rsi_3_1h < 70.0) or (last_stochrsi_k_1h > 20.0))
+      and ((last_rsi_3_4h < 70.0) or (last_stochrsi_k_4h > 20.0))
+      and ((last_rsi_3_1d < 70.0) or (last_stochrsi_k_1d > 20.0))
     ):
       self._grind_entry_tag = "g15"
       return True
@@ -69927,7 +69961,7 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroond_14 < 30.0)
       and (last_aroond_14_4h > 50.0)
       and (last_roc_9_1d < 15.0)
-      and (last_candle["STOCHRSIk_14_14_3_3_4h"] > 10.0)
+      and ((last_stochrsi_k_4h > 10.0) or (last_roc_9_4h > -30.0))
       and (last_ema_50_4h < last_ema_100_4h)
       and (last_close > (last_close_min_48 * 1.05))
     ):
