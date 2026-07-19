@@ -70,7 +70,7 @@ class NostalgiaForInfinityX7(IStrategy):
   INTERFACE_VERSION = 3
 
   def version(self) -> str:
-    return "v17.4.413"
+    return "v17.4.416"
 
   stoploss = -0.99
 
@@ -910,6 +910,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # "short_entry_condition_541_enable": True,
     "short_entry_condition_542_enable": True,
     # "short_entry_condition_543_enable": True,
+    "short_entry_condition_561_enable": False,
     "short_entry_condition_562_enable": True,
     "short_entry_condition_563_enable": False,
     # "short_entry_condition_603_enable": True,
@@ -21126,6 +21127,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_35) | (rsi_3_4h_gt_65) | (aroonu_14_1h_lt_70) | (aroonu_14_4h_lt_100) | (roc_9_1d_lt_10))
             # 15m & 1d down move, 1d still high, 4h high, 1h overbought
             & ((rsi_3_15m_gt_35) | (rsi_3_1d_gt_35) | (rsi_14_1d_lt_50) | (aroonu_14_4h_lt_80) | (roc_9_1h_lt_10))
+            # 15m & 4h down move, 15m still high, 4h high, 1d overbought
+            & ((rsi_3_15m_gt_35) | (rsi_3_4h_gt_65) | (aroonu_14_15m_lt_40) | (aroonu_14_4h_lt_80) | (roc_9_1d_lt_20))
             # 15m down move, 4h high, 1d high & overbought
             & ((rsi_3_15m_gt_35) | (stochrsi_k_4h_lt_70) | (stochrsi_k_1d_lt_80) | (roc_9_1d_lt_30))
             # 15m down move, 1h & 1d overbought
@@ -21212,6 +21215,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_45) | (stochrsi_k_1h_lt_50) | (stochrsi_k_4h_lt_70) | (roc_9_4h_lt_20))
             # 15m down move, 1h & 4h high, 1d overbought
             & ((rsi_3_15m_gt_45) | (aroonu_14_1h_lt_80) | (aroonu_14_4h_lt_100) | (roc_9_1d_lt_30))
+            # 15m down move, 4h & 1d high, 4h & 1d overbought
+            & ((rsi_3_15m_gt_45) | (aroonu_14_4h_lt_100) | (aroonu_14_1d_lt_100) | (roc_9_4h_lt_20) | (roc_9_1d_lt_30))
             # 15m down move, 1d high, 1h & 4h & 1d overbought
             & ((rsi_3_15m_gt_45) | (aroonu_14_1d_lt_100) | (roc_9_1h_lt_10) | (roc_9_4h_lt_40) | (roc_9_1d_lt_40))
             # 15m down move, 4h high, 4h & 1d overbought
@@ -21355,7 +21360,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h & 1d high, 1d overbought
             & ((stochrsi_k_4h_lt_90) | (stochrsi_k_1d_lt_90) | (roc_9_1d_lt_50))
             # 4h high, 1h & 4h overbought
-            & ((stochrsi_k_4h_lt_90) | (roc_9_1h_lt_40) | (roc_9_4h_lt_50))
+            & ((stochrsi_k_4h_lt_90) | (roc_9_1h_lt_20) | (roc_9_4h_lt_20))
             # 4h high, 1d overbought
             & ((stochrsi_k_4h_lt_90) | (roc_9_1d_lt_80))
             # Daily not crashing
@@ -26298,6 +26303,88 @@ class NostalgiaForInfinityX7(IStrategy):
           short_entry_logic.append((ema_26_shift.shift() - ema_12_shift.shift()) > (open_rate / 100.0))
           short_entry_logic.append(close < (ema_20 * 0.958))
           short_entry_logic.append(close < (bbl_20_2_0 * 0.992))
+
+        # Condition #561 - Downtrend Pullback / Continuation mode (Short). Mirror of code-64.
+        if short_entry_condition_index == 561:
+          # Protections
+          short_entry_logic.append(num_empty_288 <= allowed_empty_candles_288)
+
+          short_entry_logic.append(
+            # Trend confirmation (higher TF must be bearish)
+            (ema_12_4h < ema_200_4h)
+            # --- 5m / base bounce over-recovered or near top (rsi_3, rsi_14, willr) ---
+            # shallow daily + very strong 5m bounce + steep 4h drop (violent dead-cat)
+            & ((rsi_3 < 65.0) | (roc_9_1d < -25.0) | (roc_9_4h > -20.0))
+            # very strong 5m bounce (80+) reaching near top (willr high)
+            & ((rsi_3 < 80.0) | (willr_14 < -20.0))
+            # base RSI over-recovered (60+) + near-top bounce (willr high)
+            & ((rsi_14 < 60.0) | (willr_14 < -22.0))
+            # strong bounce (rsi_3 55+) + mild 4h drop + moderate daily = squeeze trap
+            & ((rsi_3 < 55.0) | (roc_9_4h < -12.0) | (roc_9_1d > -15.0))
+            # --- 4h momentum still up / not dropping (rsi_3_4h, roc_9_4h) ---
+            # 4h up move, 15m still maxed
+            & ((rsi_3_4h > 10.0) | (stochrsi_k_15m < 90.0))
+            # bounce with 4h not dropping on any 4h momentum (short into strength)
+            & ((rsi_3_4h < 25.0) | (roc_9_4h < -12.0) | (rsi_14_4h < 26.0))
+            # exhausted crash (daily deep-down) + 4h bouncing
+            & ((rsi_3_4h < 30.0) | (roc_9_4h < -15.0) | (roc_9_1d > -30.0))
+            # deep daily crash + 4h flat / not dropping (exhausted crash bounce)
+            & ((roc_9_4h < -10.0) | (roc_9_1d > -25.0))
+            # weak 4h down, 15m maxed (CPI squeeze)
+            & ((roc_9_4h < -5.0) | (stochrsi_k_15m < 95.0))
+            # --- 1h & 4h RSI both bounced (mirror of 64) ---
+            # 1h & 4h both bounced (LINK)
+            & ((rsi_14_1h < 41.0) | (rsi_14_4h < 38.0))
+            # 1h & 4h both bounced (SOL)
+            & ((rsi_14_1h < 45.0) | (rsi_14_4h < 38.0))
+            # --- 4h RSI elevated (not oversold) across daily contexts (rsi_14_4h) ---
+            # deep-daily bounce, 4h not oversold, willr mid-band (-22..-20) = squeeze trap (narrow window)
+            & ((rsi_14_4h < 28.0) | (willr_14 < -22.0) | (willr_14 > -20.0) | (roc_9_1d > -20.0))
+            # deep-daily dead-cat, 4h mid (rsi_3_4h~30, roc_9_4h~-16, rsi_14_4h~30) — walks willr band on re-entry (multi-TF net)
+            & ((rsi_3_4h < 25.0) | (rsi_3_4h > 35.0) | (roc_9_4h < -20.0) | (roc_9_1d > -20.0) | (rsi_14_4h < 30.0))
+            # shallow daily + 4h not oversold + weak 5m bounce
+            & ((rsi_14_4h < 28.0) | (roc_9_1d < -15.0) | (rsi_3 > 60.0))
+            # flat daily (no daily downtrend) + 4h RSI still elevated
+            & ((rsi_14_4h < 30.0) | (roc_9_1d < -10.0))
+            # deep daily crash + 4h RSI elevated (33+)
+            & ((rsi_14_4h < 33.0) | (roc_9_1d > -25.0))
+            # deep daily crash + 4h RSI elevated (35+)
+            & ((rsi_14_4h < 35.0) | (roc_9_1d > -25.0))
+            # --- 5m / 15m stoch maxed (stochrsi) ---
+            # 5m stoch high, 4h only mild down
+            & ((stochrsi_k < 80.0) | (roc_9_4h < -15.0))
+            # 15m maxed, 1h weak (escape strong downtrends)
+            & ((stochrsi_k_15m < 96.0) | (rsi_14_1h > 40.0) | (roc_9_1d < -25.0))
+            # 15m maxed, 4h weak (escape strong downtrends)
+            & ((stochrsi_k_15m < 96.0) | (rsi_14_4h > 38.0) | (roc_9_1d < -25.0))
+            # --- multi-TF net (moderate bounce indistinguishable from wins on any single TF) ---
+            & ((stochrsi_k_15m > 90.0) | (rsi_3 > 60.0) | (rsi_3_4h > 35.0) | (rsi_14_4h < 25.0) | (roc_9_1d > -25.0) | (roc_9_4h < -20.0))
+            # --- structural regime bounds ---
+            # 4h downtrend active
+            & (aroond_14_4h > 50.0)
+            # 4h not capitulated
+            & (rsi_3_4h > 14.0)
+            # Daily not pumping
+            & (roc_9_1d < 5.0)
+            # Daily not a capitulation-crash bottom
+            & (roc_9_1d > -35.0)
+          )
+
+          # Logic — Bounce in downtrend
+          short_entry_logic.append(
+            (rsi_3 < 90.0)
+            & (rsi_3_15m_lt_80)
+            # & (rsi_3_1h < 80.0)
+            & (rsi_14 > 55.0)
+            & (willr_14 > -30.0)
+            & (willr_14 < -15.0)
+            & (stochrsi_k > 70.0)
+            & (aroond_14_15m < 90.0)
+            & (stochrsi_k_15m_gt_20)
+            & (close > ema_12)
+            & (close < ema_200)
+            & (close < (bbu_20_2_0 * 0.99))
+          )
 
         # Condition #562 - Trend Breakdown mode (Short).
         if short_entry_condition_index == 562:
